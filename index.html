@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STUDY APK MOD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --bg-color: #020617;
+        --card-bg: rgba(255, 255, 255, 0.03);
+        --text-main: #f8fafc;
+        --text-sub: #94a3b8;
+        --primary: #6366f1;
+        --accent: #a855f7;
+        --nav-bg: rgba(15, 23, 42, 0.6);
+        --border: 1px solid rgba(255, 255, 255, 0.1);
+        --backdrop: blur(12px) saturate(180%);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        padding-bottom: 80px;
+        overflow-x: hidden;
+    }
+
+    /* Background Ambient Glow */
+    .glow-bg {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;
+        background:
+            radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.1), transparent 35%),
+            radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.1), transparent 35%);
+    }
+
+    .hidden { display: none !important; }
+
+    /* --- Banner --- */
+    .banner-container {
+        width: 100%;
+        padding: 15px;
+    }
+    .banner {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://i.postimg.cc/6QyxyQhK/ss.png');
+        background-size: cover;
+        background-position: center;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+        border: var(--border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .banner h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .banner p { font-size: 12px; color: #cbd5e1; margin-top: 5px; font-weight: 500; }
+
+    /* --- Section Title --- */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 15px 10px;
+    }
+    .section-header h2 {
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .section-header .count {
+        font-size: 12px;
+        color: #f39c12;
+        background: rgba(243, 156, 18, 0.1);
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    /* --- Institution Cards --- */
+    .institution-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        background: var(--card-bg);
+        backdrop-filter: var(--backdrop);
+        -webkit-backdrop-filter: var(--backdrop);
+        border: var(--border);
+        border-radius: 20px;
+        margin-bottom: 12px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .institution-card:active { transform: scale(0.97); background: rgba(255,255,255,0.08); }
+    .card-content { display: flex; align-items: center; gap: 15px; }
+    .card-logo-wrap {
+        width: 50px; height: 50px; border-radius: 14px; overflow: hidden;
+        background: #fff; flex-shrink: 0; padding: 2px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .card-logo { width: 100%; height: 100%; object-fit: contain; }
+    .card-text { flex: 1; }
+    .card-title { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
+    .card-arrow { color: var(--text-sub); opacity: 0.5; width: 20px; height: 20px; }
+
+    /* --- Floating API Button --- */
+    .floating-api {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        background: rgba(99, 102, 241, 0.2);
+        backdrop-filter: blur(8px);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 800;
+        border: var(--border);
+        z-index: 99;
+        color: white;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    /* --- Bottom Navigation --- */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 65px;
+        background-color: var(--nav-bg);
+        backdrop-filter: var(--backdrop);
+        -webkit-backdrop-filter: var(--backdrop);
+        border-top: var(--border);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        z-index: 100;
+    }
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-sub);
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .nav-item.active {
+        color: var(--primary);
+    }
+    .nav-icon {
+        font-size: 20px;
+    }
+
+    /* --- Search Bar --- */
+    .search-container {
+        padding: 15px;
+        background-color: rgba(2, 6, 23, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 101;
+        border-bottom: var(--border);
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: var(--border);
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        transition: 0.3s;
+    }
+    .search-input:focus {
+        border-color: var(--primary);
+        background: rgba(255,255,255,0.1);
+    }
+
+        /* --- WHATSAPP POPUP --- */
+        .wp-modal-overlay {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.9); backdrop-filter: blur(12px);
+          z-index: 9999; display: none; align-items: center; justify-content: center;
+          padding: 20px;
+        }
+        .wp-modal-box {
+          background: #0f172a; border-radius: 28px; width: 100%; max-width: 400px;
+          position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(34, 197, 94, 0.1);
+          animation: wpModalBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes wpModalBounce {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .wp-banner {
+          background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+          padding: 40px 20px; text-align: center; position: relative;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .wp-logo {
+          width: 120px; height: 120px; position: relative; z-index: 1;
+          border-radius: 24px;
+          object-fit: cover;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(34, 197, 94, 0.2);
+          border: 2px solid rgba(255,255,255,0.1);
+          animation: wpPulse 2s infinite;
+        }
+        @keyframes wpPulse {
+          0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.4)); }
+          50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(34, 197, 94, 0.6)); }
+          100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.4)); }
+        }
+        .wp-content { padding: 30px 24px; text-align: center; }
+        .wp-badge {
+          background: rgba(239, 68, 68, 0.15); color: #f87171;
+          padding: 5px 14px; border-radius: 50px; font-size: 11px; font-weight: 800;
+          text-transform: uppercase; letter-spacing: 1.5px; display: inline-block; margin-bottom: 18px;
+          border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .wp-title { font-size: 20px; font-weight: 800; margin-bottom: 12px; color: white; line-height: 1.3; }
+        .wp-desc { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 28px; }
+        .btn-wp-join {
+          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+          color: white; width: 100%; padding: 16px; border-radius: 16px; font-weight: 700;
+          text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 12px;
+          box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.5);
+          transition: 0.3s; border: none; cursor: pointer; font-size: 14px;
+        }
+        .btn-tg-join {
+          background: linear-gradient(135deg, #0088cc 0%, #0077b5 100%);
+          color: white; width: 100%; padding: 16px; border-radius: 16px; font-weight: 700;
+          text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 12px;
+          box-shadow: 0 10px 25px -5px rgba(0, 136, 204, 0.5);
+          transition: 0.3s; border: none; cursor: pointer; font-size: 14px;
+          margin-bottom: 12px;
+        }
+        .wp-close-btn {
+          position: absolute; top: 16px; right: 16px;
+          background: #ef4444; color: white; border: none;
+          width: 32px; height: 32px; border-radius: 10px;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; z-index: 10; transition: 0.2s;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="glow-bg"></div>
+
+<script>
+    // --- AUTO-REFRESH SCRIPT (Every 1 Minute) ---
+    setTimeout(() => {
+        // Append a timestamp to bypass cache
+        const url = new URL(window.location.href);
+        url.searchParams.set('v', Date.now());
+        window.location.href = url.toString();
+    }, 60000);
+
+    // --- HARD SECURITY: ANTI-DEVTOOLS ---
+
+    // Disable Right-Click
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disable keyboard shortcuts for DevTools
+    document.onkeydown = function(e) {
+        if (e.keyCode == 123 ||
+            (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) ||
+            (e.ctrlKey && (e.keyCode == 85 || e.keyCode == 83))) {
+            return false;
+        }
+    };
+
+    // Debugger Trap
+    setInterval(function() {
+        var start = new Date();
+        debugger;
+        var end = new Date();
+        if (end - start > 100) {
+            document.body.innerHTML = '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:bold;text-align:center;padding:20px;">SECURITY ALERT: Developer Tools Detected.</div>';
+        }
+    }, 1000);
+
+    // Clear Console
+    setInterval(() => console.clear(), 500);
+</script>
+
+<!-- Search Bar -->
+<div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search apps, batches..." oninput="searchData()">
+</div>
+
+<!-- Home Tab -->
+<div id="tab-apps" class="tab-content">
+    <div class="banner-container">
+        <div class="banner">
+            <h1>  </h1>
+            <p>Start your journey today.</p>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h2>  ALL ACTIVE  APP  🟢</h2>
+    </div>
+
+    <div id="homeList" style="padding: 0 15px;">
+
+
+
+
+
+        <!-- Physics Wallah -->
+        <a href="https://runtkyp.xo.je" target="_blank" rel="noopener noreferrer" class="institution-card" style="transition-delay: 0.05s;" data-name="KHAN GLOBAL STUDIES">
+            <div class="card-content">
+                <div class="card-logo-wrap">
+                    <img src="data:image/png;base64,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" alt="Physics Wallah" class="card-logo" />
+                </div>
+                <div class="card-text">
+                    <h3 class="card-title">1. CAREER WILL </h3>
+                </div>
+            </div>
+            <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+        </a>
+
+
+
+
+        <a href="https://studyapkmodkgs.vercel.app" target="_blank" rel="noopener noreferrer" class="institution-card" style="transition-delay: 0.05s;" data-name="KHAN GLOBAL STUDIES">
+            <div class="card-content">
+                <div class="card-logo-wrap">
+                    <img src="https://i.postimg.cc/GpdLZBnR/logo-png.jpg" alt="Physics Wallah" class="card-logo"/>
+                </div>
+                <div class="card-text">
+                    <h3 class="card-title">2. KHAN GLOBAL STUDIES</h3>
+                </div>
+            </div>
+            <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+            </div>
+        </a>
+
+
+        <!-- Physics Wallah -->
+        <a href="https://studyapkmodsway.vercel.app" target="_blank" rel="noopener noreferrer" class="institution-card" style="transition-delay: 0.05s;" data-name="KHAN GLOBAL STUDIES">
+            <div class="card-content">
+                <div class="card-logo-wrap">
+                    <img src="data:image/png;base64,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" alt="Physics Wallah" class="card-logo" />
+                </div>
+                <div class="card-text">
+                    <h3 class="card-title">3. SELECTION WAY</h3>
+                </div>
+            </div>
+            <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+        </a>
+
+
+       
+
+    </div>
+</div>
+
+<!-- Upcoming Tab -->
+<div id="tab-upcoming" class="tab-content hidden">
+    <div class="section-header">
+        <h2>🔥 Top Free Apps</h2>
+        <span class="count">0 apps</span>
+    </div>
+
+    <div class="app-list" id="appList">
+        <!-- Apps list will be rendered here -->
+    </div>
+</div>
+
+<!-- Favorites & Donate -->
+<div id="tab-favorites" class="tab-content hidden" style="padding: 40px; text-align: center; color: var(--text-sub);">
+    ⭐ Your favorite apps will appear here.
+</div>
+<div id="tab-donate" class="tab-content hidden" style="padding: 40px; text-align: center; color: var(--text-sub);">
+    ❤️ Thank you for your support!
+</div>
+
+<div class="floating-api">API</div>
+
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('apps')">
+        <div class="nav-icon">🏠</div>
+        Apps
+    </div>
+    <div class="nav-item" onclick="switchTab('upcoming')">
+        <div class="nav-icon">🔔</div>
+        Upcoming
+    </div>
+    <div class="nav-item" onclick="switchTab('favorites')">
+        <div class="nav-icon">⭐</div>
+        Favorites
+    </div>
+    <div class="nav-item" onclick="switchTab('donate')">
+        <div class="nav-icon">❤️</div>
+        Donate
+    </div>
+</div>
+
+<script>
+    const apps = [
+        { id: "8768", name: "ROJGAR WITH ANKIT", logo: "https://i.postimg.cc/7ZSf5gty/TG.png", rating: "4.9", size: "52.9K+" },
+
+    ];
+
+    function renderApps(filter = "") {
+        const container = document.getElementById('appList');
+        const filteredApps = apps.filter(app => app.name.toLowerCase().includes(filter.toLowerCase()));
+
+        container.innerHTML = filteredApps.map(app => `
+            <div class="app-item">
+                <img src="${app.logo}" class="app-logo" alt="${app.name}">
+                <div class="app-info">
+                    <div class="app-name">${app.name}</div>
+                    <div class="app-dev"><b>MADXT2Z</b> <span class="blue-tick">✓</span></div>
+                    <div class="app-meta">Education • ${app.size} • <span class="rating">★ ${app.rating}</span></div>
+                </div>
+                <a href="${app.url ? app.url : (app.id === 'web' ? 'web/index.html' : 'home.html?domainId=' + app.id)}" class="btn-get">
+                    GET
+                    <span>Free</span>
+                </a>
+            </div>
+        `).join('');
+
+        const countEl = document.querySelector('#tab-upcoming .count');
+        if(countEl) countEl.innerText = filteredApps.length + " apps";
+    }
+
+    function searchData() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+
+        // Filter Home Batches
+        const homeCards = document.querySelectorAll('#homeList .institution-card');
+        homeCards.forEach(card => {
+            const title = card.querySelector('.card-title').innerText.toLowerCase();
+            if (title.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Filter Upcoming Apps
+        renderApps(query);
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+        if(tabName === 'apps') {
+            document.getElementById('tab-apps').classList.remove('hidden');
+            document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+        } else if(tabName === 'upcoming') {
+            document.getElementById('tab-upcoming').classList.remove('hidden');
+            document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+        } else {
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.innerText.toLowerCase().includes(tabName));
+            if (activeNavItem) activeNavItem.classList.add('active');
+        }
+    }
+
+    // Script to prevent opening links in external browser
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('a');
+        if (target && target.href) {
+            // Remove target="_blank" dynamically
+            target.removeAttribute('target');
+
+            // Force navigation in same window for WebView
+            if (!target.href.startsWith('javascript:')) {
+                e.preventDefault();
+                window.location.href = target.href;
+            }
+        }
+    }, true);
+
+    renderApps();
+
+    /**
+     * FIREBASE & POPUP CONTROL
+     */
+    const firebaseConfig = {
+      apiKey: "AIzaSyARE91LbydO3PaHeE8HG-8wLFS5QzTWB3A",
+      authDomain: "data-2975c.firebaseapp.com",
+      databaseURL: "https://data-2975c-default-rtdb.firebaseio.com",
+      projectId: "data-2975c",
+      storageBucket: "data-2975c.firebasestorage.app",
+      messagingSenderId: "1001555907914",
+      appId: "1:1001555907914:web:1110dcc917e4c5cb3d9db3",
+      measurementId: "G-KXHMGDT918"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    function trackPresence() {
+        let deviceId = localStorage.getItem('portal_device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('portal_device_id', deviceId);
+        }
+
+        const update = () => {
+            db.collection('devices').doc(deviceId).set({
+                lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                platform: navigator.platform,
+                page: 'Index'
+            }, { merge: true });
+        };
+        update();
+        setInterval(update, 30000); // Update every 30s
+    }
+
+    function showWpPopup() {
+      db.collection('settings').doc('index_popup').onSnapshot((doc) => {
+          if (doc.exists && doc.data().enabled) {
+              setTimeout(() => {
+                document.getElementById('wp-popup').style.display = 'flex';
+              }, 1500);
+          } else {
+              document.getElementById('wp-popup').style.display = 'none';
+          }
+      });
+    }
+
+    function closeWpPopup() {
+      document.getElementById('wp-popup').style.display = 'none';
+    }
+
+    window.addEventListener('load', () => {
+        trackPresence();
+        showWpPopup();
+    });
+</script>
+
+<!-- Add Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+<div id="wp-popup" class="wp-modal-overlay">
+    <div class="wp-modal-box">
+        <button class="wp-close-btn" onclick="closeWpPopup()">×</button>
+        <div class="wp-banner">
+            <img src="https://i.postimg.cc/7ZSf5gty/TG.png" class="wp-logo" alt="WhatsApp">
+        </div>
+        <div class="wp-content">
+            <div class="wp-badge">● Action Required ●</div>
+            <div class="wp-title">Our Old WhatsApp Channel Has Been Banned</div>
+            <div class="wp-desc">
+                Join our <b>New Official Channels</b> for batch updates.
+            </div>
+            <a href="https://t.me/studyapkmod" target="_blank" class="btn-tg-join" onclick="closeWpPopup()">
+                JOIN TELEGRAM
+            </a>
+            <a href="https://whatsapp.com/channel/0029Vb7JCf8LNSa30ZaZTF2X" target="_blank" class="btn-wp-join" onclick="closeWpPopup()">
+                JOIN WHATSAPP
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
