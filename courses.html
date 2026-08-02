@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PW Course Catalog - Telegram Bot Integration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.06); cursor: pointer; }
+    .glass-card:hover { border-color: rgba(99, 102, 241, 0.5); transform: translateY(-3px); box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.25); }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+  <!-- Top Navigation Bar -->
+  <header class="glass sticky top-0 z-50 px-4 sm:px-8 py-4 mb-6 shadow-xl">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-500/25">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-300 via-sky-300 to-emerald-300 bg-clip-text text-transparent">
+            PW Course Catalog
+          </h1>
+          <p class="text-xs text-slate-400">Click any course to open directly in <span id="current-bot-label" class="text-indigo-400 font-semibold">@studyapkmodpwbot</span> with /start command</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+        <!-- Bot Selection Dropdown -->
+        <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-700/80 text-xs">
+          <i class="fa-brands fa-telegram text-sky-400 text-sm"></i>
+          <span class="text-slate-400 hidden sm:inline">Bot:</span>
+          <select id="bot-select" onchange="updateBotSelection()" class="bg-transparent text-slate-200 font-medium focus:outline-none cursor-pointer">
+            <option value="studyapkmodpwbot" selected>@studyapkmodpwbot</option>
+            <option value="studyapkmodpw_bot">@studyapkmodpw_bot</option>
+          </select>
+        </div>
+
+        <a href="/" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-2">
+          <i class="fa-solid fa-desktop"></i> Main App
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Search and Controls Bar -->
+    <div class="glass p-4 sm:p-5 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="relative w-full sm:w-96">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Search course title or batch ID..." 
+          class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+          oninput="handleSearch()"
+        >
+      </div>
+
+      <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto text-xs text-slate-400">
+        <div class="flex items-center gap-2 bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700/60">
+          <i class="fa-solid fa-layer-group text-indigo-400"></i>
+          <span>Total Courses: <strong id="course-count" class="text-slate-200">0</strong></span>
+        </div>
+        <button onclick="loadCourses()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition" title="Reload Courses">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="flex flex-col items-center justify-center py-20 text-center">
+      <div class="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-slate-300 font-medium">Loading Courses from https://studyapkmodpw.vercel.app/api/batches...</p>
+      <p class="text-slate-500 text-xs mt-1">Please wait while we fetch available courses</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden flex-col items-center justify-center py-16 text-center glass rounded-3xl p-8 border border-rose-500/20">
+      <div class="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-2xl mb-4">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-100 mb-1">Failed to Load Courses</h3>
+      <p id="error-message" class="text-slate-400 text-sm max-w-md mb-6">Could not fetch courses from API server.</p>
+      <button onclick="loadCourses()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition flex items-center gap-2">
+        <i class="fa-solid fa-rotate-right"></i> Try Again
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center glass rounded-3xl p-8">
+      <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl mb-4">
+        <i class="fa-solid fa-folder-open"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-100 mb-1">No Matching Courses Found</h3>
+      <p class="text-slate-400 text-sm max-w-md">Try searching for another course name or batch ID.</p>
+    </div>
+
+    <!-- Course Grid -->
+    <div id="course-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+  <script>
+    let allBatches = [];
+    let selectedBot = "studyapkmodpwbot";
+
+    function updateBotSelection() {
+      selectedBot = document.getElementById("bot-select").value || "studyapkmodpwbot";
+      document.getElementById("current-bot-label").textContent = "@" + selectedBot;
+      renderCourses(allBatches);
+    }
+
+    async function loadCourses() {
+      const loadingEl = document.getElementById("loading-state");
+      const errorEl = document.getElementById("error-state");
+      const emptyEl = document.getElementById("empty-state");
+      const gridEl = document.getElementById("course-grid");
+
+      loadingEl.classList.remove("hidden");
+      errorEl.classList.add("hidden");
+      emptyEl.classList.add("hidden");
+      gridEl.innerHTML = "";
+
+      const PRIMARY_API = "https://studyapkmodpw.vercel.app/api/batches";
+      const FALLBACK_API = "/api/batches";
+
+      try {
+        let response;
+        try {
+          response = await fetch(PRIMARY_API);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        } catch (fetchErr) {
+          console.warn("Primary API fetch failed, falling back to local proxy API:", fetchErr);
+          response = await fetch(FALLBACK_API);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        }
+
+        const resData = await response.json();
+
+        let batches = [];
+        if (Array.isArray(resData)) {
+          batches = resData;
+        } else if (Array.isArray(resData.data)) {
+          batches = resData.data;
+        } else if (resData.data && Array.isArray(resData.data.data)) {
+          batches = resData.data.data;
+        } else if (resData.data && Array.isArray(resData.data.batches)) {
+          batches = resData.data.batches;
+        } else if (Array.isArray(resData.batches)) {
+          batches = resData.batches;
+        } else if (Array.isArray(resData.result)) {
+          batches = resData.result;
+        }
+
+        function getBatchTimestamp(b) {
+          if (!b) return 0;
+          const possibleDates = [
+            b.createdAt,
+            b.startDate,
+            b.created_at,
+            b.startTime,
+            b.updatedAt,
+            b.date
+          ];
+          for (const d of possibleDates) {
+            if (d) {
+              const time = new Date(d).getTime();
+              if (!isNaN(time) && time > 0) return time;
+            }
+          }
+          const idStr = String(b._id || b.id || b.batchId || "");
+          if (/^[0-9a-fA-F]{24}$/.test(idStr)) {
+            const timestamp = parseInt(idStr.substring(0, 8), 16) * 1000;
+            if (!isNaN(timestamp) && timestamp > 0) return timestamp;
+          }
+          return 0;
+        }
+
+        batches.sort((a, b) => getBatchTimestamp(b) - getBatchTimestamp(a));
+
+        allBatches = batches.map(b => {
+          const id = b._id || b.id || b.batchId || "";
+          const name = b.name || b.title || b.batchName || "PW Batch Course";
+          let img = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop";
+
+          if (b.previewImage) {
+            if (typeof b.previewImage === "string") {
+              img = b.previewImage;
+            } else if (b.previewImage.baseUrl && b.previewImage.key) {
+              img = `${b.previewImage.baseUrl}${b.previewImage.key}`;
+            } else if (b.previewImage.url) {
+              img = b.previewImage.url;
+            }
+          } else if (b.banner) {
+            img = typeof b.banner === "string" ? b.banner : (b.banner.baseUrl && b.banner.key ? `${b.banner.baseUrl}${b.banner.key}` : img);
+          } else if (b.thumbnail) {
+            img = b.thumbnail;
+          }
+
+          return {
+            id: String(id).trim(),
+            name,
+            previewImage: img,
+            class: b.class || b.category || b.exam || "PW Course",
+            language: b.language || b.lang || "Hinglish",
+            fee: b.feeId?.discount || b.price || "Free"
+          };
+        }).filter(b => b.id);
+
+        document.getElementById("course-count").textContent = allBatches.length;
+        loadingEl.classList.add("hidden");
+
+        if (allBatches.length === 0) {
+          emptyEl.classList.remove("hidden");
+        } else {
+          renderCourses(allBatches);
+        }
+      } catch (err) {
+        console.error("Error loading courses:", err);
+        loadingEl.classList.add("hidden");
+        errorEl.classList.remove("hidden");
+        document.getElementById("error-message").textContent = err.message || "Failed to load courses from API.";
+      }
+    }
+
+    function renderCourses(courses) {
+      const gridEl = document.getElementById("course-grid");
+      const emptyEl = document.getElementById("empty-state");
+
+      if (courses.length === 0) {
+        gridEl.innerHTML = "";
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+
+      gridEl.innerHTML = courses.map(course => {
+        const botStartUrl = `https://t.me/${selectedBot}?start=${course.id}`;
+
+        return `
+          <div class="glass-card rounded-2xl overflow-hidden flex flex-col transition-all duration-300" onclick="openBotStart('${course.id}', event)">
+            <!-- Thumbnail Image -->
+            <div class="relative h-44 w-full bg-slate-900 overflow-hidden">
+              <img 
+                src="${course.previewImage}" 
+                alt="${course.name}" 
+                class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop'"
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+              
+              <div class="absolute top-3 left-3 flex gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-indigo-600/90 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider">
+                  ${course.class}
+                </span>
+              </div>
+
+              <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-300">
+                <span class="truncate bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 rounded-md border border-slate-700/60 font-mono text-[11px] text-indigo-300">
+                  ID: ${course.id}
+                </span>
+                <span class="bg-slate-900/80 backdrop-blur-sm px-2 py-1 rounded-md text-[11px] font-medium text-emerald-400">
+                  ${course.language}
+                </span>
+              </div>
+            </div>
+
+            <!-- Content Details -->
+            <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+              <div>
+                <h3 class="text-base font-bold text-slate-100 line-clamp-2 hover:text-indigo-300 transition">
+                  ${course.name}
+                </h3>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="space-y-2 pt-2 border-t border-slate-800">
+                <a 
+                  href="${botStartUrl}" 
+                  target="_blank"
+                  onclick="event.stopPropagation();"
+                  class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 transition active:scale-95"
+                >
+                  <i class="fa-brands fa-telegram text-base"></i> Open /start on @${selectedBot}
+                </a>
+
+                <button 
+                  onclick="copyStartCommand('${course.id}', event)"
+                  class="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs flex items-center justify-center gap-2 border border-slate-700/80 transition"
+                >
+                  <i class="fa-regular fa-copy text-indigo-400"></i> Copy Command (/start ${course.id})
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openBotStart(batchId, event) {
+      if (event) event.stopPropagation();
+      const url = `https://t.me/${selectedBot}?start=${batchId}`;
+      window.open(url, "_blank");
+    }
+
+    function copyStartCommand(batchId, event) {
+      if (event) event.stopPropagation();
+      const cmd = `/start ${batchId}`;
+      navigator.clipboard.writeText(cmd).then(() => {
+        alert(`Copied to clipboard!\n\nSend "${cmd}" to @${selectedBot}`);
+      }).catch(() => {
+        prompt("Copy command:", cmd);
+      });
+    }
+
+    function handleSearch() {
+      const query = document.getElementById("search-input").value.toLowerCase().trim();
+      if (!query) {
+        renderCourses(allBatches);
+        return;
+      }
+
+      const filtered = allBatches.filter(b => 
+        b.name.toLowerCase().includes(query) || 
+        b.id.toLowerCase().includes(query) ||
+        b.class.toLowerCase().includes(query)
+      );
+
+      renderCourses(filtered);
+    }
+
+    document.addEventListener("DOMContentLoaded", loadCourses);
+  </script>
+</body>
+</html>
